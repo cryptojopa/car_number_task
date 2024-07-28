@@ -8,6 +8,9 @@ public interface CarNumberRepository extends JpaRepository<CarNumber, Long> {
 
     CarNumber findById(long id);
 
-    @Query("SELECT c FROM CarNumber c WHERE c.alreadyUsed = :value ORDER BY RANDOM() LIMIT 1")
-    CarNumber findRandomCarNumberByAlreadyUsed(boolean value);
+    @Query("SELECT c FROM CarNumber c WHERE c.alreadyUsed = false ORDER BY RANDOM() LIMIT 1")
+    CarNumber findRandomUnusedCarNumber();
+
+    @Query("SELECT c FROM CarNumber c WHERE c.id > :id AND c.alreadyUsed = false ORDER BY id LIMIT 1")
+    CarNumber findNextUnusedCarNumber(long id);
 }

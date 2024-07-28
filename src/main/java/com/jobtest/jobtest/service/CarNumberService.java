@@ -36,11 +36,10 @@ public class CarNumberService {
 
     public String generateRandomNumber() {
         try {
-            CarNumber carNumber = repository.findRandomCarNumberByAlreadyUsed(false);
-            carNumber.setAlreadyUsed(true);
-            repository.save(carNumber);
-            lastNumber = carNumber;
-            return carNumber.getNumber();
+            lastNumber = repository.findRandomUnusedCarNumber();
+            lastNumber.setAlreadyUsed(true);
+            repository.save(lastNumber);
+            return lastNumber.getNumber();
         } catch (NullPointerException ex) {
             throw new NoNumbersAvailableException("Доступные номера не найдены");
         }
@@ -48,15 +47,10 @@ public class CarNumberService {
 
     public String generateNextNumber () {
         try {
-            while (true) {
-                CarNumber nextNumber = repository.findById(lastNumber.getId() + 1);
-                if (!nextNumber.isAlreadyUsed()) {
-                    nextNumber.setAlreadyUsed(true);
-                    repository.save(nextNumber);
-                    lastNumber = nextNumber;
-                    return lastNumber.getNumber();
-                }
-            }
+            lastNumber = repository.findNextUnusedCarNumber(lastNumber.getId());
+            lastNumber.setAlreadyUsed(true);
+            repository.save(lastNumber);
+            return lastNumber.getNumber();
         } catch (NullPointerException ex) {
             throw new NoNumbersAvailableException("Доступные номера не найдены или перед первым вызовом /next не был сгенерирован рандомный номер");
         }
